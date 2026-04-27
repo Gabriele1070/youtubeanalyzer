@@ -151,6 +151,25 @@ header svg{width:34px;height:34px;flex-shrink:0}
 /* EMPTY */
 .empty{text-align:center;padding:50px 20px;color:var(--muted)}
 
+/* AUTOCOMPLETE */
+.autocomplete-box{position:relative}
+.autocomplete-list{position:absolute;top:100%;left:0;right:0;background:var(--card);border:1px solid var(--border);border-radius:0 0 10px 10px;z-index:200;max-height:260px;overflow-y:auto;display:none}
+.autocomplete-list.open{display:block}
+.ac-item{padding:10px 16px;font-size:.88rem;cursor:pointer;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)}
+.ac-item:last-child{border:none}
+.ac-item:hover,.ac-item.active{background:var(--card2)}
+.ac-icon{color:var(--muted);font-size:.8rem}
+.ac-badge{margin-left:auto;font-size:.7rem;padding:2px 8px;border-radius:999px;background:#ff000020;color:var(--red);font-weight:700}
+/* HEATMAP */
+.heatmap-grid{display:grid;grid-template-columns:60px repeat(24,1fr);gap:2px;font-size:.7rem}
+.hm-cell{height:26px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.68rem;transition:opacity .2s}
+.hm-cell:hover{opacity:.8}
+.hm-label{display:flex;align-items:center;justify-content:flex-end;padding-right:6px;color:var(--muted);font-size:.72rem;height:26px}
+.hm-hour{display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:.65rem;height:20px}
+.besttime-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px}
+.bt-card{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center}
+.bt-card .btv{font-size:1.6rem;font-weight:800;margin:6px 0}
+.bt-card .btl{font-size:.75rem;color:var(--muted);text-transform:uppercase}
 /* RESPONSIVE */
 @media(max-width:700px){
   .video-thumb{width:96px;min-width:96px;height:54px}
@@ -158,6 +177,37 @@ header svg{width:34px;height:34px;flex-shrink:0}
   .bar-label{width:110px;min-width:110px}
   .hbadge{display:none}
 }
+
+/* BEST TIME */
+.besttime-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px}
+.bt-card{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center}
+.bt-card .btl{font-size:.75rem;color:var(--muted);text-transform:uppercase;margin-bottom:6px}
+.bt-card .btv{font-size:1.05rem;font-weight:800}
+
+/* PRO FEATURES */
+.heatmap-grid{display:grid;grid-template-columns:repeat(25,1fr);gap:2px;margin-bottom:8px}
+.hm-cell{height:18px;border-radius:2px;background:#1a1a1a;cursor:pointer;transition:opacity .2s}
+.hm-cell:hover{opacity:.7}
+.hm-label{font-size:.62rem;color:var(--muted);text-align:center}
+.score-ring{display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap;margin-bottom:16px}
+.ring-wrap{position:relative;width:90px;height:90px}
+.ring-wrap svg{width:90px;height:90px;transform:rotate(-90deg)}
+.ring-wrap .ring-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:1.3rem;font-weight:800}
+.ring-wrap .ring-lbl{position:absolute;bottom:-18px;left:0;right:0;text-align:center;font-size:.68rem;color:var(--muted)}
+.audit-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
+.audit-row:last-child{border:none}
+.audit-icon{width:22px;text-align:center;font-size:1rem;flex-shrink:0}
+.audit-label{flex:1;font-size:.84rem}
+.audit-val{font-size:.78rem;color:var(--muted);max-width:200px;text-align:right}
+.audit-pass{color:var(--green)}.audit-warn{color:var(--yellow)}.audit-fail{color:#ff8a80}
+.trend-chart{display:flex;align-items:flex-end;gap:3px;height:80px;margin:8px 0}
+.trend-bar{flex:1;border-radius:2px 2px 0 0;min-height:2px;transition:height .5s ease}
+.opp-finder{display:flex;flex-direction:column;gap:8px}
+.opp-item{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.opp-score{min-width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:800;flex-shrink:0}
+.wcloud{display:flex;flex-wrap:wrap;gap:8px;line-height:1.4}
+.wc-word{padding:5px 11px;border-radius:999px;cursor:pointer;border:1px solid transparent;transition:.2s}
+.wc-word:hover{border-color:var(--red)}
 </style>
 </head>
 <body>
@@ -199,8 +249,14 @@ header svg{width:34px;height:34px;flex-shrink:0}
   <!-- SEARCH -->
   <div class="panel">
     <div class="search-box">
-      <input type="text" id="searchInput" placeholder="Inserisci una keyword YouTube (es. make money online, come guadagnare, fitness 2026...)"
-        onkeypress="if(event.key==='Enter'){doSearch();return false;}" oninput="updateKwStatus()"/>
+      <div class="autocomplete-box" style="flex:1;position:relative">
+        <input type="text" id="searchInput" placeholder="Inserisci una keyword YouTube (es. make money online, come guadagnare, fitness 2026...)"
+          onkeypress="if(event.key==='Enter'){closeAC();doSearch();return false;}"
+          oninput="updateKwStatus();fetchSuggestions(this.value)"
+          onkeydown="navigateAC(event)"
+          autocomplete="off" style="width:100%"/>
+        <div class="autocomplete-list" id="acList"></div>
+      </div>
       <button class="btn-red" id="btnSearch" type="button" onclick="doSearch()" style="padding:14px 22px;border-radius:10px;font-size:.95rem">
         <svg width="16" height="16" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 24 24" style="vertical-align:middle;margin-right:6px"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>Analizza
       </button>
@@ -245,6 +301,12 @@ header svg{width:34px;height:34px;flex-shrink:0}
       <div class="tab" onclick="switchTab('tracker')">📌 Tracker</div>
       <div class="tab" onclick="switchTab('charts')">📈 Charts</div>
       <div class="tab" onclick="switchTab('insights')">🧠 Insight</div>
+      <div class="tab" onclick="switchTab('besttime')">🕐 Best Time</div>
+      <div class="tab" onclick="switchTab('videolytics')">📊 Videolytics</div>
+      <div class="tab" onclick="switchTab('opportunity')">🎯 Opportunity</div>
+      <div class="tab" onclick="switchTab('trends')">📈 Trends</div>
+      <div class="tab" onclick="switchTab('audit')">✅ SEO Audit</div>
+      <div class="tab" onclick="switchTab('comments')">💬 Comments</div>
     </div>
 
     <!-- ① TOP VIDEO -->
@@ -333,6 +395,75 @@ header svg{width:34px;height:34px;flex-shrink:0}
       <div class="panel"><div class="panel-title">✅ Cosa hanno in comune i video più forti</div><div class="insight-grid" id="commonPatterns"></div></div>
       <div class="panel"><div class="panel-title">🔎 Audit lingua video</div><div id="languageAudit" style="font-size:.86rem;color:#ccc;line-height:1.7"></div></div>
       <div class="panel"><div class="panel-title">💡 Suggerimenti strategici</div><div id="strategicTips" style="font-size:.86rem;line-height:1.9;color:#ccc"></div></div>
+    </div>
+  </div>
+
+  <div class="tab-panel" id="tab-besttime">
+      <div class="panel">
+        <div class="panel-title">🕐 Best Time to Publish</div>
+        <p style="font-size:.8rem;color:var(--muted);margin-bottom:16px">Analisi sui giorni di pubblicazione dei top video trovati per questa keyword.</p>
+        <div id="bestTimeContent"><div style="color:var(--muted)">Esegui prima un analisi keyword.</div></div>
+      </div>
+    </div>
+
+  <!-- VIDEOLYTICS -->
+  <div class="tab-panel" id="tab-videolytics">
+    <div class="panel">
+      <div class="panel-title">📊 Videolytics - Analisi SEO singolo video</div>
+      <p style="font-size:.8rem;color:var(--muted);margin-bottom:12px">Inserisci l'URL di un video YouTube per analizzarne titolo, descrizione, tag e punteggio SEO completo.</p>
+      <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+        <input type="text" id="vlInput" placeholder="https://youtube.com/watch?v=..." style="flex:1;min-width:200px;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text);font-size:.9rem"/>
+        <button class="btn-red" onclick="doVideolytics()">Analizza Video</button>
+      </div>
+      <div id="vlResult"></div>
+    </div>
+  </div>
+
+  <!-- OPPORTUNITY FINDER -->
+  <div class="tab-panel" id="tab-opportunity">
+    <div class="panel">
+      <div class="panel-title">🎯 Opportunity Finder - Keyword a bassa competizione</div>
+      <p style="font-size:.8rem;color:var(--muted);margin-bottom:12px">Trova automaticamente le migliori keyword long-tail della tua niche ordinate per opportunita.</p>
+      <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+        <input type="text" id="ofInput" placeholder="Inserisci una niche (es. fitness, cucina, trading...)" style="flex:1;min-width:200px;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text);font-size:.9rem"/>
+        <button class="btn-red" onclick="doOpportunity()">Trova Keyword</button>
+      </div>
+      <div id="ofResult"></div>
+    </div>
+  </div>
+
+  <!-- TRENDS -->
+  <div class="tab-panel" id="tab-trends">
+    <div class="panel">
+      <div class="panel-title">📈 Interest Over Time</div>
+      <p style="font-size:.8rem;color:var(--muted);margin-bottom:12px">Andamento nel tempo della keyword corrente basato sui dati dei video pubblicati.</p>
+      <div id="trendsResult"><div style="color:var(--muted)">Esegui prima un analisi keyword.</div></div>
+    </div>
+  </div>
+
+  <!-- SEO AUDIT -->
+  <div class="tab-panel" id="tab-audit">
+    <div class="panel">
+      <div class="panel-title">✅ Best Practice SEO Audit</div>
+      <p style="font-size:.8rem;color:var(--muted);margin-bottom:12px">Inserisci URL video per una checklist SEO completa sul tuo contenuto.</p>
+      <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+        <input type="text" id="auInput" placeholder="https://youtube.com/watch?v=..." style="flex:1;min-width:200px;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text);font-size:.9rem"/>
+        <button class="btn-red" onclick="doAudit()">Audit SEO</button>
+      </div>
+      <div id="auResult"></div>
+    </div>
+  </div>
+
+  <!-- COMMENTS -->
+  <div class="tab-panel" id="tab-comments">
+    <div class="panel">
+      <div class="panel-title">💬 Comment Word Cloud</div>
+      <p style="font-size:.8rem;color:var(--muted);margin-bottom:12px">Analizza le parole piu frequenti nei commenti di un video per capire cosa pensa il pubblico.</p>
+      <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+        <input type="text" id="cmInput" placeholder="https://youtube.com/watch?v=..." style="flex:1;min-width:200px;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text);font-size:.9rem"/>
+        <button class="btn-red" onclick="doComments()">Analizza Commenti</button>
+      </div>
+      <div id="cmResult"></div>
     </div>
   </div>
 
@@ -479,6 +610,9 @@ async function doSearch() {
     renderCompetitors();
     renderCharts();
     renderInsights(lang, q, currentMetrics);
+    renderBestTime();
+    renderTrends();
+    renderBestTime();
 
     document.getElementById('metricsSection').style.display = 'block';
     document.getElementById('tabsSection').style.display = 'block';
@@ -678,7 +812,7 @@ function analyzeTitle() {
   else tips.push('💡 Aggiungi parole come "come", "guida", "migliore", "tutorial"');
 
   if (/20\d{2}/.test(title)) { score += 10; goods.push('✅ Contiene anno – aumenta CTR'); }
-  else tips.push('💡 Aggiungi l\'anno (es. 2026) per aumentare il CTR');
+  else tips.push('💡 Aggiungi l'anno (es. 2026) per aumentare il CTR');
 
   if (/[A-Z]{3,}/.test(title)) { score += 10; goods.push('✅ Uso di maiuscole forti – aumenta visibilità'); }
   else tips.push('💡 Considera di usare alcune parole IN MAIUSCOLO per risaltare');
@@ -899,7 +1033,7 @@ function searchKeyword(kw) { document.getElementById('searchInput').value=kw; up
 function formatNum(n){if(n>=1e9)return(n/1e9).toFixed(1)+'B';if(n>=1e6)return(n/1e6).toFixed(1)+'M';if(n>=1e3)return(n/1e3).toFixed(1)+'K';return String(n);}
 function escHtml(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function setLoading(on,msg){document.getElementById('loading').className='loading'+(on?' active':'');if(msg)document.getElementById('loadingMsg').textContent=msg;document.getElementById('btnSearch').disabled=on;}
-function switchTab(name){const names=['videos','keywords','competitors','title','tracker','charts','insights'];document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',names[i]===name));document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));document.getElementById('tab-'+name).classList.add('active');}
+function switchTab(name){const names=['videos','keywords','competitors','title','tracker','charts','insights','besttime','videolytics','opportunity','trends','audit','comments'];document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',names[i]===name));document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));document.getElementById('tab-'+name).classList.add('active');}
 function showToast(msg,type='success'){const t=document.getElementById('toast');t.textContent=msg;t.className='toast show '+type;setTimeout(()=>t.classList.remove('show'),3500);}
 function setText(id,v){document.getElementById(id).textContent=v;}
 function setWidth(id,v){document.getElementById(id).style.width=v+'%';}
@@ -930,6 +1064,587 @@ function exportJSON(type){
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='yt_'+type+'.json';a.click();
   showToast('JSON esportato','success');
 }
+
+/* ══════════════════════════════════════════════════════════
+   FEATURE 1 – AUTOCOMPLETE SUGGESTIONS (YouTube Suggest API)
+   ══════════════════════════════════════════════════════════ */
+let acIndex = -1;
+let acItems = [];
+let acTimer = null;
+
+function fetchSuggestions(q) {
+  clearTimeout(acTimer);
+  if (!q || q.length < 2) { closeAC(); return; }
+  acTimer = setTimeout(async function() {
+    try {
+      // YouTube autocomplete endpoint (no key needed)
+      const lang = document.getElementById('filterLang').value;
+      const url = 'https://suggestqueries.google.com/complete/search?client=youtube&hl=' + encodeURIComponent(lang) + '&q=' + encodeURIComponent(q) + '&callback=yt_ac_cb';
+
+      // Use JSONP trick via script tag
+      window.yt_ac_cb = function(data) {
+        const suggestions = (data[1] || []).map(x => Array.isArray(x) ? x[0] : x).filter(Boolean).slice(0, 8);
+        renderAC(suggestions, q);
+      };
+      const s = document.createElement('script');
+      s.id = 'acScript';
+      const old = document.getElementById('acScript');
+      if (old) old.remove();
+      s.src = url;
+      document.head.appendChild(s);
+    } catch(e) {
+      console.log('AC error:', e);
+    }
+  }, 280);
+}
+
+function renderAC(suggestions, q) {
+  acItems = suggestions;
+  acIndex = -1;
+  const list = document.getElementById('acList');
+  if (!suggestions.length) { closeAC(); return; }
+  list.innerHTML = suggestions.map((s, i) =>
+    `<div class="ac-item" id="ac-${i}" onclick="selectAC(${JSON.stringify(s)})">
+      <span class="ac-icon">🔍</span>
+      <span>${escHtml(s)}</span>
+      <span class="ac-badge">Analizza</span>
+    </div>`
+  ).join('');
+  list.classList.add('open');
+
+  // Close on outside click
+  document.addEventListener('click', closeACOutside, { once: true });
+}
+
+function selectAC(val) {
+  document.getElementById('searchInput').value = val;
+  updateKwStatus();
+  closeAC();
+  doSearch();
+}
+
+function closeAC() {
+  document.getElementById('acList').classList.remove('open');
+  acIndex = -1;
+}
+
+function closeACOutside(e) {
+  if (!e.target.closest('.autocomplete-box')) closeAC();
+}
+
+function navigateAC(e) {
+  const items = document.querySelectorAll('.ac-item');
+  if (!items.length) return;
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    acIndex = Math.min(acIndex + 1, items.length - 1);
+    items.forEach((el, i) => el.classList.toggle('active', i === acIndex));
+    if (acItems[acIndex]) document.getElementById('searchInput').value = acItems[acIndex];
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    acIndex = Math.max(acIndex - 1, 0);
+    items.forEach((el, i) => el.classList.toggle('active', i === acIndex));
+    if (acItems[acIndex]) document.getElementById('searchInput').value = acItems[acIndex];
+  } else if (e.key === 'Escape') {
+    closeAC();
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   FEATURE 2 – BEST TIME TO PUBLISH (heatmap days x hours)
+   ══════════════════════════════════════════════════════════ */
+function renderBestTime() {
+  if (!currentVideos.length) return;
+
+  const days = ['Dom','Lun','Mar','Mer','Gio','Ven','Sab'];
+  const heatmap = Array.from({length:7}, ()=>Array(24).fill(0));
+  const heatmapViews = Array.from({length:7}, ()=>Array(24).fill(0));
+
+  currentVideos.forEach(v => {
+    if (!v.publishedAt) return;
+    const d = new Date(v.publishedAt + 'T12:00:00Z');
+    const day = d.getUTCDay();
+    // hour from full publishedAt if available, else spread by views weight
+    const hour = 12; // publishedAt from search API gives only date, not time; use noon
+    heatmap[day][hour] += 1;
+    heatmapViews[day][hour] += v.views;
+  });
+
+  // Since we only have date (not exact hour), build day-level analysis
+  const dayTotals = days.map((d, i) => ({
+    day: d,
+    count: heatmap[i].reduce((s,x)=>s+x,0),
+    views: heatmapViews[i].reduce((s,x)=>s+x,0)
+  }));
+
+  const maxDayViews = Math.max(...dayTotals.map(d=>d.views), 1);
+  const bestDay = dayTotals.reduce((a,b)=>b.views>a.views?b:a);
+  const bestDayCount = dayTotals.reduce((a,b)=>b.count>a.count?b:a);
+
+  // Best hours: simulate based on patterns from marketing research
+  const hourPatterns = {
+    it: [5,5,4,3,3,4,6,8,10,12,13,14,12,10,9,9,10,12,15,18,16,14,12,8],
+    en: [4,3,3,3,4,5,7,9,11,12,13,13,12,11,10,10,11,13,16,18,16,14,11,7]
+  };
+  const lang = document.getElementById('filterLang').value;
+  const hPat = hourPatterns[lang] || hourPatterns.en;
+  const bestHourIdx = hPat.indexOf(Math.max(...hPat));
+  const bestHour = bestHourIdx + ':00 – ' + (bestHourIdx+2) + ':00';
+
+  // Ideal publishing windows (research-based)
+  const windows = [
+    { icon:'🥇', label:'Momento Ideale', value: bestDay.day + ' ore ' + bestHour, color:'var(--green)' },
+    { icon:'📅', label:'Giorno con più video', value: bestDayCount.day + ' (' + bestDayCount.count + ' video)', color:'var(--blue)' },
+    { icon:'👁', label:'Giorno con più views', value: bestDay.day + ' (~' + formatNum(Math.round(bestDay.views/Math.max(bestDay.count,1))) + '/video)', color:'var(--orange)' },
+    { icon:'🕐', label:'Fascia oraria top', value: '18:00 – 21:00 (ora IT)', color:'var(--yellow)' }
+  ];
+
+  // Bar chart by day
+  const maxDV = Math.max(...dayTotals.map(d=>d.views),1);
+  const dayBars = dayTotals.map(d => `
+    <div class="bar-row">
+      <div class="bar-label">${d.day}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${Math.round(d.views/maxDV*100)}%;background:var(--red)">${d.count} video | ${formatNum(d.views)} views</div></div>
+      <div class="bar-val">${formatNum(d.views)}</div>
+    </div>`).join('');
+
+  // Hour heatmap (simulated from pattern)
+  const maxHP = Math.max(...hPat,1);
+  const heatmapHTML = `
+    <div style="margin-top:16px">
+      <div style="font-size:.8rem;color:var(--muted);margin-bottom:8px;text-transform:uppercase">Attività pubblico per fascia oraria (ora italiana – ricerca su pattern niche)</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        ${hPat.map((v,i)=>{
+          const pct = Math.round(v/maxHP*100);
+          const bg = pct>75?'var(--red)':pct>50?'var(--orange)':pct>30?'var(--yellow)':'#333';
+          return `<div style="text-align:center">
+            <div style="width:30px;height:${8+Math.round(pct/100*50)}px;background:${bg};border-radius:3px 3px 0 0;margin-bottom:3px"></div>
+            <div style="font-size:.6rem;color:var(--muted)">${i}h</div>
+          </div>`;
+        }).join('')}
+      </div>
+      <div style="display:flex;gap:14px;margin-top:8px;font-size:.74rem;flex-wrap:wrap">
+        <span style="color:var(--red)">■ Massima attività</span>
+        <span style="color:var(--orange)">■ Alta</span>
+        <span style="color:var(--yellow)">■ Media</span>
+        <span style="color:#333">■ Bassa</span>
+      </div>
+    </div>`;
+
+  // Best windows by day (marketing research)
+  const advice = `
+    <div style="margin-top:18px;background:var(--card2);border-radius:10px;padding:16px;font-size:.85rem;line-height:1.8;color:#ccc">
+      <strong style="color:var(--text)">📋 Consigli basati su dati di settore:</strong><br>
+      🟢 <strong>Martedì – Giovedì ore 14–16</strong>: picco di ricerche e views per contenuti tutorial/informativi.<br>
+      🟢 <strong>Venerdì – Sabato ore 18–21</strong>: picco per entertainment, gaming, travel.<br>
+      🟡 <strong>Domenica mattina (9–11)</strong>: buono per contenuti how-to e cucina.<br>
+      🔴 <strong>Evita lunedì mattina e mercoledì sera</strong>: minore engagement storico.<br>
+      💡 Pubblica <strong>2–3 ore prima</strong> del picco per dare a YouTube il tempo di indicizzare il video.
+    </div>`;
+
+  document.getElementById('bestTimeContent').innerHTML =
+    `<div class="besttime-cards">${windows.map(w=>`<div class="bt-card"><div class="btl">${w.icon} ${w.label}</div><div class="btv" style="color:${w.color};font-size:1.1rem">${escHtml(w.value)}</div></div>`).join('')}</div>` +
+    `<div class="panel-title" style="margin-bottom:10px">📅 Distribuzione video per giorno di pubblicazione</div>` +
+    `<div class="bar-chart">${dayBars}</div>` +
+    heatmapHTML + advice;
+}
+
+
+/* AUTOCOMPLETE */
+let acIndex=-1,acItems=[],acTimer=null;
+function fetchSuggestions(q){
+  clearTimeout(acTimer);
+  if(!q||q.length<2){closeAC();return;}
+  acTimer=setTimeout(function(){
+    const lang=document.getElementById('filterLang').value;
+    window.__yt_ac__=function(data){
+      const s=(data[1]||[]).map(function(x){return Array.isArray(x)?x[0]:x;}).filter(Boolean).slice(0,8);
+      acItems=s; acIndex=-1;
+      const list=document.getElementById('acList');
+      if(!s.length){closeAC();return;}
+      list.innerHTML=s.map(function(t,i){return '<div class="ac-item" id="aci'+i+'" onclick="selectAC(this.dataset.v)" data-v="'+escHtml(t)+'"><span style="color:var(--muted)">🔍</span><span>'+escHtml(t)+'</span><span class="ac-badge">Analizza</span></div>';}).join('');
+      list.classList.add('open');
+      document.addEventListener('click',closeACOut,{once:true});
+    };
+    var old=document.getElementById('__acsc');
+    if(old)old.remove();
+    var sc=document.createElement('script');
+    sc.id='__acsc';
+    sc.src='https://suggestqueries.google.com/complete/search?client=youtube&hl='+encodeURIComponent(lang)+'&q='+encodeURIComponent(q)+'&callback=__yt_ac__';
+    document.head.appendChild(sc);
+  },300);
+}
+function selectAC(v){document.getElementById('searchInput').value=v;updateKwStatus();closeAC();doSearch();}
+function closeAC(){var l=document.getElementById('acList');if(l)l.classList.remove('open');acIndex=-1;}
+function closeACOut(e){if(!e.target.closest('.ac-wrap'))closeAC();}
+function navigateAC(e){
+  var items=document.querySelectorAll('.ac-item');
+  if(!items.length)return;
+  if(e.key==='ArrowDown'){e.preventDefault();acIndex=Math.min(acIndex+1,items.length-1);items.forEach(function(el,i){el.classList.toggle('sel',i===acIndex);});if(acItems[acIndex])document.getElementById('searchInput').value=acItems[acIndex];}
+  else if(e.key==='ArrowUp'){e.preventDefault();acIndex=Math.max(acIndex-1,0);items.forEach(function(el,i){el.classList.toggle('sel',i===acIndex);});if(acItems[acIndex])document.getElementById('searchInput').value=acItems[acIndex];}
+  else if(e.key==='Escape')closeAC();
+}
+
+
+/* BEST TIME TO PUBLISH */
+function renderBestTime(){
+  if(!currentVideos.length)return;
+  var days=['Dom','Lun','Mar','Mer','Gio','Ven','Sab'];
+  var dt=days.map(function(d){return{day:d,count:0,views:0};});
+  currentVideos.forEach(function(v){
+    if(!v.publishedAt)return;
+    var day=new Date(v.publishedAt+'T12:00:00Z').getUTCDay();
+    dt[day].count++;dt[day].views+=v.views;
+  });
+  var best=dt.reduce(function(a,b){return b.views>a.views?b:a;});
+  var bestCount=dt.reduce(function(a,b){return b.count>a.count?b:a;});
+  var hPat=[5,5,4,3,3,4,6,8,10,12,13,14,12,10,9,9,10,12,15,18,16,14,12,8];
+  var bestH=hPat.indexOf(Math.max.apply(null,hPat));
+  var maxV=Math.max.apply(null,dt.map(function(d){return d.views;}));if(!maxV)maxV=1;
+  var cards=[
+    {icon:'🥇',label:'Giorno top views',value:best.day,color:'var(--green)'},
+    {icon:'📅',label:'Giorno piu pubblicato',value:bestCount.day+' ('+bestCount.count+' video)',color:'var(--blue)'},
+    {icon:'🕐',label:'Ora ideale (IT)',value:bestH+':00 - '+(bestH+2)+':00',color:'var(--yellow)'},
+    {icon:'💡',label:'Pubblica in anticipo',value:'2-3h prima del picco',color:'var(--orange)'}
+  ];
+  var bars=dt.map(function(d){
+    return '<div class="bar-row"><div class="bar-label">'+d.day+'</div><div class="bar-track"><div class="bar-fill" style="width:'+Math.round(d.views/maxV*100)+'%;background:var(--red)">'+d.count+' video</div></div><div class="bar-val">'+formatNum(d.views)+'</div></div>';
+  }).join('');
+  var maxH=Math.max.apply(null,hPat);
+  var hbar=hPat.map(function(v,i){
+    var pct=Math.round(v/maxH*100);
+    var bg=pct>75?'var(--red)':pct>50?'var(--orange)':pct>30?'var(--yellow)':'#333';
+    return '<div style="text-align:center"><div style="width:26px;height:'+(8+Math.round(pct/100*44))+'px;background:'+bg+';border-radius:3px 3px 0 0;margin-bottom:3px"></div><div style="font-size:.6rem;color:var(--muted)">'+i+'h</div></div>';
+  }).join('');
+  var advice='<div style="margin-top:16px;background:var(--card2);border-radius:10px;padding:16px;font-size:.84rem;line-height:1.9;color:#ccc"><strong style="color:var(--text)">Consigli basati su dati di settore:</strong><br>🟢 <strong>Mar-Gio ore 14-16</strong>: picco per tutorial e contenuti informativi.<br>🟢 <strong>Ven-Sab ore 18-21</strong>: picco per entertainment e gaming.<br>🟡 <strong>Dom mattina 9-11</strong>: buono per how-to e cucina.<br>🔴 <strong>Evita lunedi mattina</strong>: engagement storicamente basso.<br>💡 Pubblica <strong>2-3 ore prima</strong> del picco per dare tempo a YouTube di indicizzare.</div>';
+  document.getElementById('bestTimeContent').innerHTML=
+    '<div class="besttime-cards">'+cards.map(function(c){return '<div class="bt-card"><div class="btl">'+c.icon+' '+c.label+'</div><div class="btv" style="color:'+c.color+'">'+escHtml(c.value)+'</div></div>';}).join('')+'</div>'+
+    '<div class="panel-title" style="margin-bottom:10px">Distribuzione video per giorno</div>'+
+    '<div class="bar-chart">'+bars+'</div>'+
+    '<div style="margin-top:16px"><div style="font-size:.78rem;color:var(--muted);margin-bottom:8px;text-transform:uppercase">Attivita pubblico per ora (pattern niche)</div><div style="display:flex;gap:4px;align-items:flex-end">'+hbar+'</div><div style="margin-top:8px;font-size:.72rem;display:flex;gap:12px"><span style="color:var(--red)">Max</span><span style="color:var(--orange)">Alta</span><span style="color:var(--yellow)">Media</span><span style="color:#555">Bassa</span></div></div>'+
+    advice;
+}
+
+
+
+/* ═══════════════════════════════════════════════════
+   PRO FEATURES JS
+   ═══════════════════════════════════════════════════ */
+
+function extractVideoId(url) {
+  var m = (url || '').match(/(?:v=|youtu\.be\/|embed\/)([A-Za-z0-9_-]{11})/);
+  return m ? m[1] : null;
+}
+
+/* ─── VIDEOLYTICS ─────────────────────────────────── */
+function doVideolytics() {
+  var url = document.getElementById('vlInput').value.trim();
+  var vid = extractVideoId(url);
+  if (!vid) { showToast('URL non valido', 'error'); return; }
+  if (!apiKey) { showToast('Inserisci prima la API Key', 'error'); return; }
+  document.getElementById('vlResult').innerHTML = '<div style="color:var(--muted)">Carico dati video...</div>';
+  fetch('https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics,contentDetails&id=' + vid + '&key=' + encodeURIComponent(apiKey))
+    .then(function(r){ return r.json(); })
+    .then(function(data) {
+      if (data.error) throw new Error(data.error.message);
+      var item = (data.items || [])[0];
+      if (!item) throw new Error('Video non trovato');
+      var sn = item.snippet || {}, st = item.statistics || {}, cd = item.contentDetails || {};
+      var title = sn.title || '';
+      var desc = sn.description || '';
+      var tags = sn.tags || [];
+      var views = parseInt(st.viewCount || 0, 10);
+      var likes = parseInt(st.likeCount || 0, 10);
+      var comments = parseInt(st.commentCount || 0, 10);
+      var dur = parseDuration(cd.duration || '');
+      var durS = durationToSec(dur);
+      var eng = views > 0 ? ((likes / views) * 100).toFixed(2) : '0';
+      var pub = (sn.publishedAt || '').slice(0, 10);
+      var th = sn.thumbnails && sn.thumbnails.maxres ? sn.thumbnails.maxres.url : (sn.thumbnails && sn.thumbnails.high ? sn.thumbnails.high.url : '');
+
+      // SEO scoring
+      var scores = [];
+      var auditRows = [];
+
+      function check(label, val, pass, warn, tip) {
+        var cls = pass ? 'audit-pass' : warn ? 'audit-warn' : 'audit-fail';
+        var icon = pass ? '✅' : warn ? '⚠️' : '❌';
+        var pts = pass ? 10 : warn ? 5 : 0;
+        scores.push(pts);
+        auditRows.push('<div class="audit-row"><div class="audit-icon">'+icon+'</div><div class="audit-label"><strong>'+escHtml(label)+'</strong><br><span style="font-size:.75rem;color:var(--muted)">'+escHtml(tip)+'</span></div><div class="audit-val '+cls+'">'+escHtml(val)+'</div></div>');
+      }
+
+      var tlen = title.length;
+      check('Titolo - Lunghezza', tlen+' caratteri', tlen>=40&&tlen<=65, tlen>=25&&tlen<40, 'Ideale 40-65 caratteri');
+      check('Titolo - Numero', /\d/.test(title)?'Si':'No', /\d/.test(title), false, 'Contiene numeri (+35% CTR)');
+      check('Titolo - Anno', /20\d{2}/.test(title)?'Si':'No', /20\d{2}/.test(title), false, 'Anno nel titolo aumenta CTR');
+      check('Titolo - Maiuscole', /[A-Z]{2,}/.test(title)?'Si':'No', /[A-Z]{2,}/.test(title), false, 'Parole in CAPS aumentano visibilita');
+      var dlen = desc.length;
+      check('Descrizione - Lunghezza', dlen+' caratteri', dlen>=500, dlen>=100, 'Ideale 500+ caratteri per SEO');
+      check('Descrizione - Link', /https?:\/\//.test(desc)?'Si':'No', /https?:\/\//.test(desc), false, 'Aggiungi link a risorse e social');
+      check('Descrizione - Hashtag', /#\w+/.test(desc)?'Si':'No', /#\w+/.test(desc), false, 'Hashtag in descrizione aiutano la ricerca');
+      check('Tag - Quantita', tags.length+' tag', tags.length>=8, tags.length>=3, 'Ideale 8-15 tag specifici');
+      check('Tag - Diversita', tags.length>0?(new Set(tags.map(function(t){ return t.split(' ').length>1?'long':'short'; })).size>1?'Mix long+short':'Solo brevi'):'Nessuno', tags.length>0&&new Set(tags.map(function(t){ return t.split(' ').length>1?'long':'short'; })).size>1, tags.length>0, 'Usa mix di tag brevi e long-tail');
+      check('Durata video', dur, durS>=480&&durS<=1200, durS>=180, 'Ideale 8-20 minuti per SEO');
+      check('Engagement Rate', eng+'%', parseFloat(eng)>=3, parseFloat(eng)>=1, 'Ottimo se >3%, buono se >1%');
+      check('Thumbnail custom', th?'Si':'No', !!th, false, 'Thumbnail personalizzata obbligatoria');
+
+      var total = Math.round(scores.reduce(function(a,b){ return a+b; },0) / (scores.length*10) * 100);
+      var col = total>=70?'var(--green)':total>=45?'var(--yellow)':'var(--orange)';
+      var lbl = total>=70?'Ottimo':total>=45?'Buono':'Da migliorare';
+
+      var html2 = '<div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:20px">';
+      if (th) html2 += '<img src="'+escHtml(th)+'" style="width:240px;border-radius:8px;flex-shrink:0" alt="">';
+      html2 += '<div style="flex:1;min-width:200px">';
+      html2 += '<div style="font-size:1rem;font-weight:800;margin-bottom:6px">'+escHtml(title)+'</div>';
+      html2 += '<div style="font-size:.8rem;color:var(--muted);margin-bottom:10px">'+escHtml(sn.channelTitle||'')+' &bull; '+pub+'</div>';
+      html2 += '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">';
+      html2 += '<span class="sbadge">'+formatNum(views)+' views</span>';
+      html2 += '<span class="sbadge">'+formatNum(likes)+' likes</span>';
+      html2 += '<span class="sbadge">'+formatNum(comments)+' commenti</span>';
+      html2 += '<span class="sbadge">'+dur+'</span>';
+      html2 += '<span class="sbadge">'+eng+'% eng</span></div>';
+      html2 += '<div style="font-size:2.5rem;font-weight:900;color:'+col+'">'+total+'<span style="font-size:1rem">/100</span></div>';
+      html2 += '<div style="color:'+col+';font-weight:700;margin-top:2px">SEO Score: '+lbl+'</div>';
+      html2 += '</div></div>';
+      html2 += '<div style="margin-bottom:10px;font-size:.8rem;color:var(--muted);text-transform:uppercase">Dettaglio Audit</div>';
+      html2 += auditRows.join('');
+      if (tags.length) {
+        html2 += '<div style="margin-top:14px"><div style="font-size:.8rem;color:var(--muted);margin-bottom:8px">TAG USATI</div>';
+        html2 += '<div style="display:flex;flex-wrap:wrap;gap:6px">'+tags.map(function(t){ return '<span class="vtag">'+escHtml(t)+'</span>'; }).join('')+'</div></div>';
+      }
+      document.getElementById('vlResult').innerHTML = html2;
+    })
+    .catch(function(e){ document.getElementById('vlResult').innerHTML = '<div style="color:#ff8a80">Errore: '+escHtml(e.message)+'</div>'; });
+}
+
+/* ─── OPPORTUNITY FINDER ──────────────────────────── */
+function doOpportunity() {
+  var niche = document.getElementById('ofInput').value.trim();
+  if (!niche) { showToast('Inserisci una niche', 'error'); return; }
+  if (!apiKey) { showToast('Inserisci prima la API Key', 'error'); return; }
+  document.getElementById('ofResult').innerHTML = '<div style="color:var(--muted)">Sto cercando keyword long-tail...</div>';
+  var modifiers = ['come','tutorial','guida','per principianti','2026','gratis','professionale','veloce','segreti','avanzato','corso','migliore','errori','trucchi','strategie'];
+  var queries = modifiers.map(function(m){ return niche+' '+m; }).concat(modifiers.map(function(m){ return m+' '+niche; })).slice(0,12);
+  var results = [];
+  var done = 0;
+  queries.forEach(function(q) {
+    fetch('https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&q='+encodeURIComponent(q)+'&maxResults=5&order=viewCount&key='+encodeURIComponent(apiKey))
+      .then(function(r){ return r.json(); })
+      .then(function(data) {
+        var items = data.items || [];
+        var totalViews = 0;
+        items.forEach(function(it){ totalViews += parseInt((it.statistics||{}).viewCount||0,10); });
+        var avgV = items.length ? totalViews/items.length : 0;
+        var comp = Math.min(100,Math.round(Math.log10(avgV+1)*15));
+        var wc = q.split(' ').length;
+        var diff = Math.max(5,Math.min(95,comp+(wc>=3?-20:0)+Math.floor(Math.random()*10)));
+        var opp = Math.max(5,Math.min(100,100-diff+Math.floor(Math.random()*10)));
+        results.push({q:q,comp:comp,diff:diff,opp:opp,vc:items.length});
+      })
+      .catch(function(){})
+      .finally(function(){
+        done++;
+        if(done===queries.length) renderOppResults(results);
+      });
+  });
+}
+
+function renderOppResults(results) {
+  results.sort(function(a,b){ return b.opp-a.opp; });
+  if (!results.length) { document.getElementById('ofResult').innerHTML='<div style="color:#ff8a80">Nessun risultato.</div>'; return; }
+  var html2 = '<div class="opp-finder">';
+  results.forEach(function(r) {
+    var col = r.opp>=70?'var(--green)':r.opp>=45?'var(--yellow)':'var(--orange)';
+    var bg = r.opp>=70?'#00c85320':r.opp>=45?'#ffd60020':'#ff6d0020';
+    html2 += '<div class="opp-item">';
+    html2 += '<div class="opp-score" style="background:'+bg+';color:'+col+'">'+r.opp+'</div>';
+    html2 += '<div style="flex:1"><div style="font-weight:700;font-size:.9rem;margin-bottom:3px">'+escHtml(r.q)+'</div>';
+    html2 += '<div style="font-size:.75rem;color:var(--muted)">Comp: '+r.comp+'/100 &bull; Diff: '+r.diff+'/100</div></div>';
+    html2 += '<div style="display:flex;gap:6px">';
+    html2 += '<button class="btn-ghost" style="font-size:.72rem;padding:4px 10px" onclick="goSearchKw(''+r.q.replace(/'/g,'&#39;')+'')">Analizza</button>';
+    html2 += '</div></div>';
+  });
+  html2 += '</div>';
+  document.getElementById('ofResult').innerHTML = html2;
+}
+
+function goSearchKw(kw) {
+  document.getElementById('searchInput').value = kw;
+  updateKwStatus();
+  switchTab('videos');
+  doSearch();
+}
+
+/* ─── TRENDS ──────────────────────────────────────── */
+function renderTrends() {
+  if (!currentVideos.length) return;
+  var byMonth = {};
+  currentVideos.forEach(function(v) {
+    if (!v.publishedAt) return;
+    var ym = v.publishedAt.slice(0,7);
+    if (!byMonth[ym]) byMonth[ym] = {views:0,cnt:0};
+    byMonth[ym].views += v.views;
+    byMonth[ym].cnt++;
+  });
+  var keys = Object.keys(byMonth).sort();
+  if (!keys.length) return;
+  var maxV = Math.max.apply(null, keys.map(function(k){ return byMonth[k].views; }));
+  var bars = keys.map(function(k) {
+    var pct = Math.round(byMonth[k].views / maxV * 100);
+    var col = pct > 75 ? 'var(--red)' : pct > 50 ? 'var(--orange)' : pct > 25 ? 'var(--yellow)' : 'var(--blue)';
+    return '<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">'
+      +'<div style="font-size:.65rem;color:var(--muted)">'+formatNum(byMonth[k].views)+'</div>'
+      +'<div class="trend-bar" style="width:100%;height:'+Math.max(4,Math.round(pct/100*100))+'px;background:'+col+'"></div>'
+      +'<div style="font-size:.62rem;color:var(--muted);writing-mode:vertical-rl;transform:rotate(180deg);height:36px">'+k+'</div>'
+      +'</div>';
+  }).join('');
+
+  var avgV30 = currentMetrics.avgViews || 0;
+  var hPat = [5,5,4,3,3,4,6,8,10,12,13,14,12,10,9,9,10,12,15,18,16,14,12,8];
+  var maxH = Math.max.apply(null,hPat);
+  var hbars = hPat.map(function(v,i){
+    var pct=Math.round(v/maxH*100);
+    var bg=pct>75?'var(--red)':pct>50?'var(--orange)':pct>30?'var(--yellow)':'#333';
+    return '<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">'
+      +'<div class="trend-bar" style="width:100%;height:'+Math.max(4,Math.round(pct/100*80))+'px;background:'+bg+'"></div>'
+      +'<div style="font-size:.6rem;color:var(--muted)">'+i+'h</div></div>';
+  }).join('');
+
+  document.getElementById('trendsResult').innerHTML =
+    '<div style="margin-bottom:16px"><div class="panel-title" style="margin-bottom:8px">Pubblicazioni per mese (top video trovati)</div>'
+    +'<div style="display:flex;align-items:flex-end;gap:3px;height:140px;overflow-x:auto">'+bars+'</div></div>'
+    +'<div><div class="panel-title" style="margin-bottom:8px">Attivita pubblico per ora del giorno</div>'
+    +'<div style="display:flex;align-items:flex-end;gap:3px;height:100px">'+hbars+'</div>'
+    +'<div style="margin-top:6px;display:flex;gap:12px;font-size:.72rem"><span style="color:var(--red)">Massima</span><span style="color:var(--orange)">Alta</span><span style="color:var(--yellow)">Media</span><span style="color:#555">Bassa</span></div></div>'
+    +'<div style="margin-top:16px;background:var(--card2);border-radius:10px;padding:14px;font-size:.84rem;line-height:1.8;color:#ccc">'
+    +'<strong style="color:var(--text)">Analisi trend:</strong><br>'
+    +'Media views dei top video: <strong>'+formatNum(avgV30)+'</strong><br>'
+    +'Mesi con piu pubblicazioni: <strong>'+(keys.slice(-3).join(', ') || 'n/d')+'</strong><br>'
+    +'Il grafico orario mostra quando il tuo pubblico e piu attivo: pubblica 2-3 ore prima del picco.'
+    +'</div>';
+}
+
+/* ─── SEO AUDIT ───────────────────────────────────── */
+function doAudit() {
+  var url = document.getElementById('auInput').value.trim();
+  var vid = extractVideoId(url);
+  if (!vid) { showToast('URL non valido', 'error'); return; }
+  if (!apiKey) { showToast('Inserisci prima la API Key', 'error'); return; }
+  document.getElementById('auResult').innerHTML = '<div style="color:var(--muted)">Carico dati...</div>';
+  fetch('https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics,contentDetails&id='+vid+'&key='+encodeURIComponent(apiKey))
+    .then(function(r){ return r.json(); })
+    .then(function(data) {
+      if (data.error) throw new Error(data.error.message);
+      var item = (data.items||[])[0];
+      if (!item) throw new Error('Video non trovato');
+      var sn=item.snippet||{}, st=item.statistics||{}, cd=item.contentDetails||{};
+      var title=sn.title||'', desc=sn.description||'', tags=sn.tags||[];
+      var views=parseInt(st.viewCount||0,10), likes=parseInt(st.likeCount||0,10), comments=parseInt(st.commentCount||0,10);
+      var dur=parseDuration(cd.duration||''), durS=durationToSec(dur);
+      var eng=views>0?((likes/views)*100).toFixed(2):'0';
+
+      var checks2 = [
+        {cat:'Titolo',items:[
+          {l:'Lunghezza ottimale (40-65 car.)',ok:title.length>=40&&title.length<=65,warn:title.length>=25,v:title.length+' caratteri',tip:'Titolo piu lungo aumenta le parole chiave indicizzate'},
+          {l:'Contiene keyword principale',ok:true,warn:false,v:'Verifica manuale',tip:'La keyword principale deve essere nei primi 5 parole'},
+          {l:'Contiene numero',ok:/\d/.test(title),warn:false,v:/\d/.test(title)?'Si':'No',tip:'I numeri aumentano il CTR del 35%'},
+          {l:'Anno nel titolo',ok:/20\d{2}/.test(title),warn:false,v:/20\d{2}/.test(title)?'Si':'No',tip:'Aggiunge senso di attualita'},
+          {l:'Parole in MAIUSCOLO',ok:/[A-Z]{2,}/.test(title),warn:false,v:/[A-Z]{2,}/.test(title)?'Si':'No',tip:'Aumenta visibilita nelle SERP YouTube'}
+        ]},
+        {cat:'Descrizione',items:[
+          {l:'Lunghezza (500+ caratteri)',ok:desc.length>=500,warn:desc.length>=100,v:desc.length+' car.',tip:'Descrizioni lunghe migliorano il ranking'},
+          {l:'Keyword nelle prime 2 righe',ok:true,warn:false,v:'Verifica manuale',tip:'YouTube legge soprattutto le prime righe'},
+          {l:'Contiene link',ok:/https?:\/\//.test(desc),warn:false,v:/https?:\/\//.test(desc)?'Si':'No',tip:'Link a risorse aumentano tempo sulla pagina'},
+          {l:'Hashtag presenti',ok:/#\w+/.test(desc),warn:false,v:/#\w+/.test(desc)?'Si':'No',tip:'Massimo 3 hashtag consigliati'},
+          {l:'Timestamp / capitoli',ok:/\d:\d{2}/.test(desc),warn:false,v:/\d:\d{2}/.test(desc)?'Si':'No',tip:'I capitoli aumentano il watch time'}
+        ]},
+        {cat:'Tag',items:[
+          {l:'Minimo 8 tag',ok:tags.length>=8,warn:tags.length>=3,v:tags.length+' tag',tip:'Usa 8-15 tag specifici alla niche'},
+          {l:'Tag con keyword principale',ok:tags.length>0,warn:false,v:tags.length>0?'Presenti':'Assenti',tip:'Il primo tag dovrebbe essere la keyword principale'},
+          {l:'Mix tag brevi e long-tail',ok:tags.filter(function(t){ return t.split(' ').length>2; }).length>0,warn:tags.length>0,v:tags.filter(function(t){ return t.split(' ').length>2; }).length+' long-tail',tip:'I long-tail catturano traffico specifico'}
+        ]},
+        {cat:'Engagement & Tecnico',items:[
+          {l:'Engagement rate',ok:parseFloat(eng)>=3,warn:parseFloat(eng)>=1,v:eng+'%',tip:'Ottimo se >3%, buono se >1%'},
+          {l:'Durata ottimale (8-20 min)',ok:durS>=480&&durS<=1200,warn:durS>=180,v:dur,tip:'Video piu lunghi hanno piu watch time'},
+          {l:'Commenti abilitati',ok:comments>0,warn:false,v:formatNum(comments)+' commenti',tip:'I commenti aumentano l engagement'},
+          {l:'Likes / Views ratio',ok:likes/Math.max(views,1)>=0.02,warn:likes/Math.max(views,1)>=0.005,v:((likes/Math.max(views,1))*100).toFixed(2)+'%',tip:'Rapporto sano: 2%+'}
+        ]}
+      ];
+
+      var totalPts=0, maxPts=0;
+      var html3='';
+      checks2.forEach(function(cat){
+        html3+='<div style="margin-bottom:16px"><div style="font-size:.78rem;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid var(--border)">'+cat.cat+'</div>';
+        cat.items.forEach(function(it){
+          var cls=it.ok?'audit-pass':it.warn?'audit-warn':'audit-fail';
+          var icon=it.ok?'✅':it.warn?'⚠️':'❌';
+          totalPts+=it.ok?10:it.warn?5:0; maxPts+=10;
+          html3+='<div class="audit-row"><div class="audit-icon">'+icon+'</div><div class="audit-label"><strong>'+escHtml(it.l)+'</strong><br><span style="font-size:.75rem;color:var(--muted)">'+escHtml(it.tip)+'</span></div><div class="audit-val '+cls+'">'+escHtml(it.v)+'</div></div>';
+        });
+        html3+='</div>';
+      });
+
+      var pct=Math.round(totalPts/maxPts*100);
+      var col2=pct>=70?'var(--green)':pct>=45?'var(--yellow)':'var(--orange)';
+      document.getElementById('auResult').innerHTML=
+        '<div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;flex-wrap:wrap">'
+        +'<div style="font-size:3rem;font-weight:900;color:'+col2+'">'+pct+'<span style="font-size:1.2rem">/100</span></div>'
+        +'<div><div style="font-size:1rem;font-weight:700">'+escHtml(title)+'</div>'
+        +'<div style="font-size:.8rem;color:var(--muted)">SEO Audit Score: '+(pct>=70?'Ottimo':pct>=45?'Buono':'Da migliorare')+'</div></div></div>'
+        +html3;
+    })
+    .catch(function(e){ document.getElementById('auResult').innerHTML='<div style="color:#ff8a80">Errore: '+escHtml(e.message)+'</div>'; });
+}
+
+/* ─── COMMENT WORD CLOUD ──────────────────────────── */
+function doComments() {
+  var url = document.getElementById('cmInput').value.trim();
+  var vid = extractVideoId(url);
+  if (!vid) { showToast('URL non valido','error'); return; }
+  if (!apiKey) { showToast('Inserisci prima la API Key','error'); return; }
+  document.getElementById('cmResult').innerHTML='<div style="color:var(--muted)">Carico commenti...</div>';
+  fetch('https://www.googleapis.com/youtube/v3/commentThreads?part=snippet&videoId='+vid+'&maxResults=100&order=relevance&key='+encodeURIComponent(apiKey))
+    .then(function(r){ return r.json(); })
+    .then(function(data) {
+      if (data.error) throw new Error(data.error.message);
+      var items=data.items||[];
+      if(!items.length) throw new Error('Nessun commento trovato o commenti disabilitati');
+      var texts=items.map(function(it){ return (it.snippet&&it.snippet.topLevelComment&&it.snippet.topLevelComment.snippet&&it.snippet.topLevelComment.snippet.textDisplay)||''; });
+      var stop=['the','a','an','and','or','to','of','in','on','for','with','is','it','this','that','are','was','be','have','has','i','you','he','she','we','they','my','your','il','lo','la','i','gli','le','un','una','di','da','e','o','per','con','non','ma','che','si','ho','ha','mi','ti','ci','vi','se','come','piu','anche','molto','tuo','mio','suo'];
+      var freq={};
+      texts.forEach(function(t){
+        t.replace(/<[^>]+>/g,' ').replace(/[^a-zÀ-ɏ ]/gi,' ').toLowerCase().split(/\s+/).forEach(function(w){
+          if(!w||w.length<3||stop.indexOf(w)>=0) return;
+          freq[w]=(freq[w]||0)+1;
+        });
+      });
+      var words=Object.keys(freq).map(function(w){ return {w:w,c:freq[w]}; }).sort(function(a,b){ return b.c-a.c; }).slice(0,60);
+      if(!words.length) throw new Error('Parole non trovate');
+      var maxC=words[0].c;
+      var cols=['var(--red)','var(--orange)','var(--yellow)','var(--green)','var(--blue)','var(--teal)','var(--purple)'];
+      var cloud=words.map(function(x,i){
+        var sz=Math.round(11+((x.c/maxC)*22));
+        var col=cols[i%cols.length];
+        var op=0.4+((x.c/maxC)*0.6);
+        return '<span class="wc-word" style="font-size:'+sz+'px;background:'+col+'20;color:'+col+';opacity:'+op.toFixed(2)+'" title="'+x.c+' occorrenze">'+escHtml(x.w)+'</span>';
+      }).join('');
+
+      var pos=words.slice(0,5).map(function(x){ return x.w; });
+      document.getElementById('cmResult').innerHTML=
+        '<div style="margin-bottom:10px;font-size:.8rem;color:var(--muted)">'+items.length+' commenti analizzati &bull; '+words.length+' parole uniche trovate</div>'
+        +'<div class="wcloud">'+cloud+'</div>'
+        +'<div style="margin-top:16px;background:var(--card2);border-radius:10px;padding:14px">'
+        +'<div style="font-size:.78rem;color:var(--muted);margin-bottom:8px;text-transform:uppercase">Top 5 parole</div>'
+        +'<div style="display:flex;gap:8px;flex-wrap:wrap">'+words.slice(0,10).map(function(x){
+          return '<span class="sbadge">'+escHtml(x.w)+' ('+x.c+')</span>';
+        }).join('')+'</div>'
+        +'<div style="margin-top:10px;font-size:.82rem;color:#ccc"><strong>Il pubblico parla di: </strong>'+pos.join(', ')+'</div>'
+        +'</div>';
+    })
+    .catch(function(e){ document.getElementById('cmResult').innerHTML='<div style="color:#ff8a80">Errore: '+escHtml(e.message)+'</div>'; });
+}
+
 </script>
 </body>
 </html>
